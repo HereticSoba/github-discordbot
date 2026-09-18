@@ -1,0 +1,12 @@
+{
+    "name": "github-discord-bot",
+    "version": "1.0.0",
+    "description": "Bot para notificaciones de GitHub a Discord mediante Vercel Serverless Functions.",
+    "main": "api/github-webhook.js",
+    "scripts": {
+        "start": "vercel dev"
+    },
+    "dependencies": {
+        "axios": "^1.6.0"
+    }
+}

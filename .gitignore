@@ -1,0 +1,4 @@
+#Omitidos
+node_modules/
+.env.local
+.vercel
