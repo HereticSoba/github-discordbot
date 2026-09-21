@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'Repositorio no registrado en el sistema.' });
     }
 
-    const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+    const DISCORD_WEBHOOK_URL = connection.discord_webhook_url;
     let discordMessage = '';
 
     /* Pushes */
@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
         const commitsCount = body.commits?.length || 0;
         const compareUrl = body.compare;
 
-        discordMessage = `🚀 **[${repo}]** ¡**${pusher}** realizó un push de **${commitsCount}** commit(s)!\n🔗 **Ver cambios:** ${compareUrl}`;
+        discordMessage = `🚀 **[${repoFullName}]** ¡**${pusher}** realizó un push de **${commitsCount}** commit(s)!\n🔗 **Ver cambios:** ${compareUrl}`;
     }
 
     /* Issues */
