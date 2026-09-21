@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitCord - De GitHub a Discord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<!-- Header y Navbar -->
+
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between font-sans">
+    <header class="p-6 border-b border-slate-800 flex justify-between items-center max-w-6xl mx-auto w-full">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">Miau</span>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                GitCord</h1>
+        </div>
+        <span
+            class="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/20">Beta</span>
+    </header>
+
+    <!-- Hero -->
+    <main class="max-w-4xl mx-auto px-6 py-6 py-12 text-center flex-grow flex flex-col justify-center">
+        <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
+            ¡Conecta tus repositorios de GitHub a Discord de manera fácil!
+        </h2>
+        <p class="text-slate-400 text-lg mb-8 max-w-2xl mx-auto">
+            Recibe notificaciones automáticas de commits, pull requests e issues en tu canal de Discord sin
+            configuración compleja.
+        </p>
+
+        <div
+            class="bg-slate-800/60 backdrop-blur border border-slate-700 p-8 rounded-2xl text-left max-w-lg mx-auto w-full">
+            <form id="connectForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Repositorio de GitHub</label>
+                    <input type="text" id="github_repo" placeholder="Usuario/Nombre-del-repo" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focs:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">URL del Webhook de Discord</label>
+                    <input type="url" id="discord_webhook_url" placeholder="https://discord.com/api/webhooks/..."
+                        required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Tu identificador (Opcional)</label>
+                    <input type="text" id="user_id" placeholder="Ej: tu_usuario_discord"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg shadow-indigo-600/30">
+                    Vincular Integración
+                </button>
+            </form>
+            <div id="statusMessage" class="mt-4 text-sm text-center hidden"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-slate-500 text-sm border-t border-slate-800">
+        <p>© 2026 GitCord. Potenciado por Vercel & Supabase</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('connectForm');
+        const statusMsg = document.getElementById('statusMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            statusMsg.classList.remove('hidden', 'text-green-400', 'text-red-400');
+            statusMsg.textContent = 'Guardando conexión...';
+
+            const payload = {
+                github_repo: document.getElementById('github_repo').value.trim(),
+                discord_webhook_url: document.getElementById('discord_webhook_url').value.trim(),
+                user_id: document.getElementById('user_id').value.trim() || 'Anon'
+            };
+
+            try {
+                const response = await fetch('/api/save-connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusMsg.classList.add('text-green-400');
+                    statusMsg.textContent = '!Conexión guardada con éxito.!';
+                    form.reset();
+                } else {
+                    statusMsg.classList.add('text-red-400');
+                    statusMsg.textContent = result.error || 'Error al guardar la conexión.';
+                }
+            } catch (err) {
+                statusMsg.classList.add('text-red-400');
+                statusMsg.textContent = 'Error de red al conectar con el servidor.';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
 
     if (error || !connection) {
         console.error('No se encontró conexión en BD para el repositorio: ${repoFullName}');
-        return res.status(400).json({ error: 'Repositorio no registrado en el sistema.', buscado: repoFullName, error_supabase: error ? error.message : 'Fila no encontrada (null)' });
+        return res.status(400).json({ error: 'Repositorio no registrado en el sistema.' });
     }
 
     const DISCORD_WEBHOOK_URL = connection.discord_webhook_url;
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
     /* Confirmación a Discord */
     if (discordMessage) {
         try {
-            await axios.post(DISCORD_WEBHOOK_URL, {content: discordMessage,});
+            await axios.post(DISCORD_WEBHOOK_URL, { content: discordMessage, });
             return res.status(200).json({ message: 'Notificación enviada a Discord.' });
         } catch (error) {
             console.error('Error al enviar a Discord:', error?.response?.data || error.message);
