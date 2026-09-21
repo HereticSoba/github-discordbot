@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
 
     if (error || !connection) {
         console.error('No se encontró conexión en BD para el repositorio: ${repoFullName}');
-        return res.status(400).json({ error: 'Repositorio no registrado en el sistema.' });
+        return res.status(400).json({ error: 'Repositorio no registrado en el sistema.', buscado: repoFullName, error_supabase: error ? error.message : 'Fila no encontrada (null)' });
     }
 
     const DISCORD_WEBHOOK_URL = connection.discord_webhook_url;
