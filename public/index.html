@@ -32,7 +32,6 @@
                 </button>
             </div>
         </div>
-
     </header>
 
     <!-- Hero -->
@@ -79,7 +78,7 @@
                 <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
                     <span>🔌</span> Tus Integraciones
                 </h3>
-                <span id="connecitonCount"
+                <span id="connectionCount"
                     class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
                     0 Conexiones
                 </span>
@@ -251,6 +250,9 @@
                     statusMsg.classList.add('text-green-400');
                     statusMsg.textContent = '!Conexión guardada con éxito!';
                     form.reset();
+                    if (user) {
+                        fetchUserConnections(user.id);
+                    }
                 } else {
                     statusMsg.classList.add('text-red-400');
                     statusMsg.textContent = result.error || 'Error al guardar la conexión.';
@@ -273,10 +275,10 @@
                 const result = await response.json();
 
                 if (response.ok && Array.isArray(result.connections)) {
-                    dashboardSection.classList, remove('hidden');
+                    dashboardSection.classList.remove('hidden');
                     const connections = result.connections;
 
-                    connectionCount.textContent = `${connections.length}${connections.length === 1 ? 'Conexión' : 'Conexiones'}`;
+                    connectionCount.textContent = `${connections.length} ${connections.length === 1 ? 'Conexión' : 'Conexiones'}`;
                     if (connections.length === 0) {
                         connectionsList.innerHTML = `
                         <div class="text-center py-6 text-slate-400 text-sm">
@@ -289,7 +291,7 @@
                         <div class="overflow-hidden">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
-                                </div>
+                            </div>
                                 <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
                                 <p class="text-xs text-slate-400 truncate mt-1">
                                     <span class="text-slate-500">Webhook:</span> ${conn.discord_webhook_url}
@@ -298,8 +300,8 @@
                     </div>
                     `).join('');
                 }
-            }catch(err){
-                console.error('Error al cargar conexiones',err);
+            } catch (err) {
+                console.error('Error al cargar conexiones', err);
             }
         }
     </script>
