@@ -197,6 +197,11 @@
         }
 
         async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        async function checkUserSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
 
             if (session && session.user) {
