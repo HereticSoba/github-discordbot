@@ -212,10 +212,12 @@
             statusMsg.classList.remove('hidden', 'text-green-400', 'text-red-400');
             statusMsg.textContent = 'Guardando conexión...';
 
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
             const payload = {
                 github_repo: document.getElementById('github_repo').value.trim(),
                 discord_webhook_url: document.getElementById('discord_webhook_url').value.trim(),
-                user_id: document.getElementById('user_id').value.trim() || 'Anon'
+                user_id: user ? user.id : (document.getElementById('user_id').value.trim() || 'Anon')
             };
 
             try {

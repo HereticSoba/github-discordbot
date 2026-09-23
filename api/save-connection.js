@@ -1,11 +1,11 @@
 const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
-        res.status(405).json({ error: 'Método no permitido.' });
+        return res.status(405).json({ error: 'Método no permitido.' });
     }
 
     const { github_repo, discord_webhook_url, user_id } = req.body || {};
