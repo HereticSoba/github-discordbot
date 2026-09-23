@@ -72,6 +72,22 @@
             <div id="statusMessage" class="mt-4 text-sm text-center hidden"></div>
         </div>
 
+        <!-- Dashboard -->
+        <section id="dashboardSection"
+            class="mt-12 hidden text-left max-w-2xl mx-auto w-full bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-6 border-b border-slate-700/60 pb-4">
+                <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                    <span>🔌</span> Tus Integraciones
+                </h3>
+                <span id="connecitonCount"
+                    class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
+                    0 Conexiones
+                </span>
+            </div>
+            <div id="connectionsList" class="space-y-4">
+                <!-- carga dinámica -->
+            </div>
+        </section>
         <section
             class="mt-12 text-left max-w-2xl mx-auto w-full bg-slate-800/30 border border-slate-800 rounded-2xl p-6">
             <h3 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
@@ -196,6 +212,8 @@
                     </button>
                 </div>
                 `;
+
+                fetchUserConnections(user.id);
             }
         }
 
@@ -242,6 +260,48 @@
                 statusMsg.textContent = 'Error de red al conectar con el servidor.';
             }
         });
+
+        async function fetchUserConnections(userId) {
+            const dashboardSection = document.getElementById('dashboardSection');
+            const connectionsList = document.getElementById('connectionsList');
+            const connectionCount = document.getElementById('connectionCount');
+
+            if (!dashboardSection || !connectionsList) return;
+
+            try {
+                const response = await fetch(`/api/get-connections?user_id=${encodeURIComponent(userId)}`);
+                const result = await response.json();
+
+                if (response.ok && Array.isArray(result.connections)) {
+                    dashboardSection.classList, remove('hidden');
+                    const connections = result.connections;
+
+                    connectionCount.textContent = `${connections.length}${connections.length === 1 ? 'Conexión' : 'Conexiones'}`;
+                    if (connections.length === 0) {
+                        connectionsList.innerHTML = `
+                        <div class="text-center py-6 text-slate-400 text-sm">
+                            No tienes integraciones vinculadas aún. ¡Agrega la primera en el formulario!
+                        </div>`;
+                        return;
+                    }
+                    connectionsList.innerHTML = connections.map(conn => `
+                    <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:border-indigo-500/50">
+                        <div class="overflow-hidden">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
+                                </div>
+                                <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
+                                <p class="text-xs text-slate-400 truncate mt-1">
+                                    <span class="text-slate-500">Webhook:</span> ${conn.discord_webhook_url}
+                                </p>
+                        </div>
+                    </div>
+                    `).join('');
+                }
+            }catch(err){
+                console.error('Error al cargar conexiones',err);
+            }
+        }
     </script>
 </body>
 
