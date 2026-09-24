@@ -30,4 +30,4 @@ module.exports = async (req, res) => {
         console.error('Error interno:', err.message);
         return res.status(500).json({error: 'Error del servidor al procesar la solicitud.'});
     }
-}
+};

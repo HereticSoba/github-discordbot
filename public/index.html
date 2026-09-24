@@ -133,6 +133,30 @@
                 </li>
             </ol>
         </section>
+        <div id="deleteModal"
+            class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+                <div
+                    class="w-12 h-12 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20 text-xl">
+                    ⚠️
+                </div>
+                <h3 class="text-lg font-bold text-slate-100 mb-2">Eliminar integración</h3>
+                <p class="text-sm text-slate-400 mb-6">
+                    ¿Estás seguro que deseas eliminar esta conexión? Las notificaciones de este repositorio dejarán de
+                    enviarse a Discord.
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="closeDeleteModal()"
+                        class="w-1/2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-2.5 rounded-lg text-xs transition">
+                        Cancelar
+                    </button>
+                    <button id="confirmDeleteBtn"
+                        class="w-1/2 bg-red-600 hover:bg-red-500 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-lg shadow-red-600/30">
+                        Si, estoy seguro
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -297,7 +321,7 @@
                                     <span class="text-slate-500">Webhook:</span> ${conn.discord_webhook_url}
                                 </p>
                         </div>
-                        <button onclick="deleteConnection('${conn.id}')"
+                        <button onclick="openDeleteModal('${conn.id}')"
                             class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
                             title="Eliminar integración">
                             🗑️
@@ -310,18 +334,38 @@
             }
         }
 
-        async function deleteConnection(id) {
-            if (!confirm('¿Estás seguro que deseas eliminar esta integración?')) return;
+        let pendingDeleteId = null;
+
+        function openDeleteModal(id) {
+            pendingDeleteId = id;
+            const modal = document.getElementById('deleteModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            pendingDeleteId = null;
+            const modal = document.getElementById('deleteModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!pendingDeleteId) return;
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) return;
+
+            const btn = document.getElementById('confirmDeleteBtn');
+            btn.textContent = 'Eliminando...'
+            btn.disabled = true;
 
             try {
                 const response = await fetch('/api/delete-connection', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: id, user_id: user.id })
+                    body: JSON.stringify({ id: pendingDeleteId, user_id: user.id })
                 });
+
                 if (response.ok) {
+                    closeDeleteModal();
                     fetchUserConnections(user.id);
                 } else {
                     const result = await response.json();
@@ -329,8 +373,11 @@
                 }
             } catch (err) {
                 console.error('Error de red al eliminar:', err);
+            } finally {
+                btn.textContent = 'Si, eliminar';
+                btn.disabled = false;
             }
-        }
+        });
     </script>
 </body>
 
