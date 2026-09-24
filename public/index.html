@@ -310,7 +310,9 @@
                         </div>`;
                         return;
                     }
-                    connectionsList.innerHTML = connections.map(conn => `
+                    connectionsList.innerHTML = connections.map(conn => {
+                        const maskedWebhook = conn.discord_webhook_url.replace(/\/webhooks\/(\d+)\/(.+)$/, '/webhooks/$1/••••••••••••••••');
+                        return `
                     <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:border-indigo-500/50">
                         <div class="overflow-hidden">
                             <div class="flex items-center gap-2 mb-1">
@@ -327,7 +329,8 @@
                             🗑️
                         </button>
                     </div>
-                    `).join('');
+                    `;
+                    }).join('');
                 }
             } catch (err) {
                 console.error('Error al cargar conexiones', err);
@@ -378,6 +381,23 @@
                 btn.disabled = false;
             }
         });
+
+        function toggleWebhookVisibility(connId) {
+            const textElement = document.getElementById('webhook-text-${connId}');
+            const btnElement = document.getElementById('toggle-btn-${connId}');
+
+            if (!textElement || !btnElement) return;
+            const fullUrl = textElement.getAttribute('data-full-url');
+            const maskedUrl = textElement.getAttribute('data-masked-url');
+
+            if (textElement.textContent.trim() === maskedUrl) {
+                textElement.textContent = fullUrl;
+                btnElement.textContent = '🙈';
+            } else {
+                textElement.textContent = maskedUrl;
+                btnElement.textContent = '👁️';
+            }
+        }
     </script>
 </body>
 
