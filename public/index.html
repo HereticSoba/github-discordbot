@@ -319,9 +319,19 @@
                                 <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
                             </div>
                                 <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
-                                <p class="text-xs text-slate-400 truncate mt-1">
-                                    <span class="text-slate-500">Webhook:</span> ${conn.discord_webhook_url}
-                                </p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p class="text-xs text-slate-400 truncate font-mono">
+                                        <span class="text-slate-500 font-sans">Webhook:</span>
+                                        <span id="webhook-text-${conn.id}" data-full-url="${conn.discord_webhook_url}" data-masked-url="${maskedWebhook}">
+                                            ${maskedWebhook}
+                                        </span>
+                                    </p>
+                                <button onclick="toggleWebhookVisibility('${conn.id}')"
+                                    id="toggle-btn-${conn.id}"
+                                    class="text-xs text-slate-400 hover:text-slate-200 p-1 rounded transition hover:bg-slate-800" title="Mostrar / Ocultar Webhook">
+                                    👁️
+                                </button>
+                            </div>
                         </div>
                         <button onclick="openDeleteModal('${conn.id}')"
                             class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
@@ -383,8 +393,8 @@
         });
 
         function toggleWebhookVisibility(connId) {
-            const textElement = document.getElementById('webhook-text-${connId}');
-            const btnElement = document.getElementById('toggle-btn-${connId}');
+            const textElement = document.getElementById(`webhook-text-${connId}`);
+            const btnElement = document.getElementById(`toggle-btn-${connId}`);
 
             if (!textElement || !btnElement) return;
             const fullUrl = textElement.getAttribute('data-full-url');
