@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitCord - De GitHub a Discord</title>
+    <link rel="icon" type="image/png" href="./logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -37,11 +38,11 @@
     <!-- Hero -->
     <main class="max-w-4xl mx-auto px-6 py-6 py-12 text-center flex-grow flex flex-col justify-center">
         <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-            ¡Conecta tus repositorios de GitHub a Discord de manera fácil!
+            ¡Conecta tus repositorios de GitHub a Discord fácilmente!
         </h2>
         <p class="text-slate-400 text-lg mb-8 max-w-2xl mx-auto">
             Recibe notificaciones automáticas de commits, pull requests e issues en tu canal de Discord sin
-            configuración compleja.
+            configuración avanzada.
         </p>
 
         <div
@@ -74,7 +75,8 @@
         <!-- Dashboard -->
         <section id="dashboardSection"
             class="mt-12 hidden text-left max-w-2xl mx-auto w-full bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 shadow-xl">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-700/60 pb-4">
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-700/60 pb-4">
                 <div>
                     <h3 class="text-xl font-bold text-slate-100">Integraciones activas</h3>
                     <button onclick="toggleAllWebhooks()" id="globalVisibilityBtn"
@@ -262,7 +264,20 @@
             statusMsg.classList.remove('hidden', 'text-green-400', 'text-red-400');
             statusMsg.textContent = 'Guardando conexión...';
 
+            const submitBtn = document.getElementById('submitBtn');
             const { data: { user } } = await supabaseClient.auth.getUser();
+
+            /* Estado de carga */
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="inline-flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Vinculando...
+                </span>
+            `;
 
             const payload = {
                 github_repo: document.getElementById('github_repo').value.trim(),
@@ -293,6 +308,9 @@
             } catch (err) {
                 statusMsg.classList.add('text-red-400');
                 statusMsg.textContent = 'Error de red al conectar con el servidor.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Vincular Integración';
             }
         });
 
