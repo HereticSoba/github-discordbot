@@ -74,11 +74,9 @@
         <!-- Dashboard -->
         <section id="dashboardSection"
             class="mt-12 hidden text-left max-w-2xl mx-auto w-full bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 shadow-xl">
-            <div class="flex items-center justify-between mb-6 border-b border-slate-700/60 pb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate-700/60 pb-4">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                        <span>Integraciones activas</span>
-                    </h3>
+                    <h3 class="text-xl font-bold text-slate-100">Integraciones activas</h3>
                     <button onclick="toggleAllWebhooks()" id="globalVisibilityBtn"
                         class="mt-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition bg-slate-800/70 hover:bg-slate-700/60 px-2.5 py-1.5 rounded-lg border border-slate-700/50">
                         <svg id="globalEyeIcon" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
@@ -90,7 +88,7 @@
                     </button>
                 </div>
                 <span id="connectionCount"
-                    class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
+                    class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30 self-start sm:self-center">
                     0 Conexiones
                 </span>
             </div>
@@ -428,8 +426,8 @@
             }
 
             webhookElements.forEach(el => {
-                const fullUrl = textElement.getAttribute('data-full-url');
-                const maskedUrl = textElement.getAttribute('data-masked-url');
+                const fullUrl = el.getAttribute('data-full-url');
+                const maskedUrl = el.getAttribute('data-masked-url');
                 el.textContent = isWebhooksVisible ? fullUrl : maskedUrl;
             });
         }
