@@ -78,10 +78,20 @@
                 <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
                     <span>Integraciones activas</span>
                 </h3>
-                <span id="connectionCount"
-                    class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
-                    0 Conexiones
-                </span>
+                <button onclick="toggleAllWebhooks()" id="globalVisibilityBtn"
+                    class="mt-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition bg-slate-800/70 hover:bg-slate-700/60 px-2.5 py-1.5 rounded-lg border border-slate-700/50">
+                    <svg id="globalEyeIcon" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />
+                    </svg>
+                    <span id="globalEyeText">Mostrar Webhooks</span>
+                </button>
+            </div>
+            <span id="connectionCount"
+                class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
+                0 Conexiones
+            </span>
             </div>
             <div id="connectionsList" class="space-y-4">
                 <!-- carga dinámica -->
@@ -287,6 +297,8 @@
             }
         });
 
+        let isWebhooksVisible = false;
+
         async function fetchUserConnections(userId) {
             const dashboardSection = document.getElementById('dashboardSection');
             const connectionsList = document.getElementById('connectionsList');
@@ -312,6 +324,7 @@
                     }
                     connectionsList.innerHTML = connections.map(conn => {
                         const maskedWebhook = conn.discord_webhook_url.replace(/\/webhooks\/(\d+)\/(.+)$/, '/webhooks/$1/••••••••••••••••');
+                        const displayedWebhook = isWebhooksVisible ? conn.discord_webhook_url : maskedWebhook;
                         return `
                     <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:border-indigo-500/50">
                         <div class="overflow-hidden">
@@ -323,15 +336,10 @@
                                     <p class="text-xs text-slate-400 truncate font-mono">
                                         <span class="text-slate-500 font-sans">Webhook:</span>
                                         <span id="webhook-text-${conn.id}" data-full-url="${conn.discord_webhook_url}" data-masked-url="${maskedWebhook}">
-                                            ${maskedWebhook}
+                                            ${displayedWebhook}
                                         </span>
                                     </p>
-                                <button onclick="toggleWebhookVisibility('${conn.id}')"
-                                    id="toggle-btn-${conn.id}"
-                                    class="text-xs text-slate-400 hover:text-slate-200 p-1 rounded transition hover:bg-slate-800" title="Mostrar / Ocultar Webhook">
-                                    👁️
-                                </button>
-                            </div>
+                                </div>
                         </div>
                         <button onclick="openDeleteModal('${conn.id}')"
                             class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
@@ -392,21 +400,37 @@
             }
         });
 
+        const eyeOpenIcon = `
+        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+        `;
+
+        const eyeClosedIcon = `
+        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/>
+            </svg>
+        `;
+
         function toggleWebhookVisibility(connId) {
-            const textElement = document.getElementById(`webhook-text-${connId}`);
-            const btnElement = document.getElementById(`toggle-btn-${connId}`);
+            isWebhooksVisible = !isWebhooksVisible;
 
-            if (!textElement || !btnElement) return;
-            const fullUrl = textElement.getAttribute('data-full-url');
-            const maskedUrl = textElement.getAttribute('data-masked-url');
+            const btnText = document.getElementById('globalEyeText');
+            const eyeIconContainer = document.getElementById('globalEyeIcon');
+            const webhookElements = document.querySelectorAll('.webhook-text');
 
-            if (textElement.textContent.trim() === maskedUrl) {
-                textElement.textContent = fullUrl;
-                btnElement.textContent = '🙈';
-            } else {
-                textElement.textContent = maskedUrl;
-                btnElement.textContent = '👁️';
+            if (btnText && eyeIconContainer) {
+                btnText.textContent = isWebhooksVisible ? 'Ocultar Webhooks' : 'Mostrar Webhooks';
+                eyeIconContainer.outerHTML = isWebhooksVisible ? eyeOpenIcon : eyeClosedIcon;
+                const newSvg = document.querySelector('#globalVisibilityBtn svg');
+                if (newSvg) newSvg.id = 'globalEyeIcon';
             }
+
+            webhookElements.forEach(el => {
+                const fullUrl = textElement.getAttribute('data-full-url');
+                const maskedUrl = textElement.getAttribute('data-masked-url');
+            });
         }
     </script>
 </body>
