@@ -271,7 +271,7 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
                 <span class="inline-flex items-center gap-2">
-                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-4 w-4 text-white" fill:"none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
@@ -355,6 +355,12 @@
                                 </p>
                             </div>
                         </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button onclick="testWebhook('${conn.discord_webhook_url}', '${conn.github_repo}', this)"
+                                class="text-xs text-slate-300 hover:text-indigo-300 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-700 flex items-center gap-1"
+                                title="Probar integración de Discord">
+                                    🧪 Probar
+                            </button>
                         <button onclick="openDeleteModal('${conn.id}')"
                             class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
                             title="Eliminar integración">
@@ -453,8 +459,8 @@
 
             const toast = document.createElement('div');
             toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium transition-all duration-300 transform translate-y-4 opacity-0 ${type === 'success'
-                    ? 'bg-slate-800 border-emerald-500/40 text-emerald-300'
-                    : 'bg-slate-800 border-red-500/40 text-red-300'
+                ? 'bg-slate-800 border-emerald-500/40 text-emerald-300'
+                : 'bg-slate-800 border-red-500/40 text-red-300'
                 }`;
 
             const icon = type === 'success'
@@ -472,6 +478,44 @@
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
+        }
+
+        async function testWebhook(webhookUrl, repoName, btnElement) {
+            const originalText = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = `
+            <span class="inline-flex items-center gap-1">
+                <svg class="animate-spin h-3 w-3 text-indigo-400" fill:"none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Enviando mensaje de prueba...
+                    </span>
+            `;
+
+            try {
+                const response = await fetch('/api/test-connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discord_webhook_url: webhookUrl,
+                        github_repo: repoName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast('¡Notificación de prueba enviada a Discord!', 'success');
+                } else {
+                    showToast(result.error || 'Error al enviar la prueba.', 'error');
+                }
+            } catch (err) {
+                showToast('Error de red al realizar la prueba.', 'error');
+            } finally {
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalText;
+            }
         }
     </script>
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
