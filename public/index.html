@@ -75,23 +75,24 @@
         <section id="dashboardSection"
             class="mt-12 hidden text-left max-w-2xl mx-auto w-full bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 shadow-xl">
             <div class="flex items-center justify-between mb-6 border-b border-slate-700/60 pb-4">
-                <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                    <span>Integraciones activas</span>
-                </h3>
-                <button onclick="toggleAllWebhooks()" id="globalVisibilityBtn"
-                    class="mt-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition bg-slate-800/70 hover:bg-slate-700/60 px-2.5 py-1.5 rounded-lg border border-slate-700/50">
-                    <svg id="globalEyeIcon" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />
-                    </svg>
-                    <span id="globalEyeText">Mostrar Webhooks</span>
-                </button>
-            </div>
-            <span id="connectionCount"
-                class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
-                0 Conexiones
-            </span>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <span>Integraciones activas</span>
+                    </h3>
+                    <button onclick="toggleAllWebhooks()" id="globalVisibilityBtn"
+                        class="mt-2 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition bg-slate-800/70 hover:bg-slate-700/60 px-2.5 py-1.5 rounded-lg border border-slate-700/50">
+                        <svg id="globalEyeIcon" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" />
+                        </svg>
+                        <span id="globalEyeText">Mostrar Webhooks</span>
+                    </button>
+                </div>
+                <span id="connectionCount"
+                    class="text-xs font-semibold bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/30">
+                    0 Conexiones
+                </span>
             </div>
             <div id="connectionsList" class="space-y-4">
                 <!-- carga dinámica -->
@@ -327,19 +328,19 @@
                         const displayedWebhook = isWebhooksVisible ? conn.discord_webhook_url : maskedWebhook;
                         return `
                     <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:border-indigo-500/50">
-                        <div class="overflow-hidden">
+                        <div class="overflow-hidden flex-grow">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
                             </div>
-                                <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <p class="text-xs text-slate-400 truncate font-mono">
-                                        <span class="text-slate-500 font-sans">Webhook:</span>
-                                        <span id="webhook-text-${conn.id}" data-full-url="${conn.discord_webhook_url}" data-masked-url="${maskedWebhook}">
-                                            ${displayedWebhook}
-                                        </span>
-                                    </p>
-                                </div>
+                            <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-xs text-slate-400 truncate font-mono">
+                                    <span class="text-slate-500 font-sans">Webhook:</span>
+                                    <span class="webhook-text" data-full-url="${conn.discord_webhook_url}" data-masked-url="${maskedWebhook}">
+                                        ${displayedWebhook}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
                         <button onclick="openDeleteModal('${conn.id}')"
                             class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
@@ -413,9 +414,8 @@
             </svg>
         `;
 
-        function toggleWebhookVisibility(connId) {
+        function toggleAllWebhooks() {
             isWebhooksVisible = !isWebhooksVisible;
-
             const btnText = document.getElementById('globalEyeText');
             const eyeIconContainer = document.getElementById('globalEyeIcon');
             const webhookElements = document.querySelectorAll('.webhook-text');
@@ -430,6 +430,7 @@
             webhookElements.forEach(el => {
                 const fullUrl = textElement.getAttribute('data-full-url');
                 const maskedUrl = textElement.getAttribute('data-masked-url');
+                el.textContent = isWebhooksVisible ? fullUrl : maskedUrl;
             });
         }
     </script>
