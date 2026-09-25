@@ -29,11 +29,16 @@ module.exports = async (req, res) => {
         .single();
 
     if (error || !connection) {
-        console.error('No se encontró conexión en BD para el repositorio: ${repoFullName}');
+        console.error(`No se encontró conexión en BD para el repositorio: ${repoFullName}`);
         return res.status(400).json({ error: 'Repositorio no registrado en el sistema.' });
     }
 
     const DISCORD_WEBHOOK_URL = connection.discord_webhook_url;
+
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['host'] || 'github-discordbot.vercel.app';
+    const logoUrl = `${protocol}://${host}/logo.png`;
+
     let discordMessage = '';
 
     /* Pushes */
@@ -59,7 +64,11 @@ module.exports = async (req, res) => {
     /* Confirmación a Discord */
     if (discordMessage) {
         try {
-            await axios.post(DISCORD_WEBHOOK_URL, { content: discordMessage, });
+            await axios.post(DISCORD_WEBHOOK_URL, {
+                username: 'GitCord',
+                avatar_url: logoUrl,
+                content: discordMessage
+            });
             return res.status(200).json({ message: 'Notificación enviada a Discord.' });
         } catch (error) {
             console.error('Error al enviar a Discord:', error?.response?.data || error.message);
