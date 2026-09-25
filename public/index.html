@@ -295,19 +295,16 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    statusMsg.classList.add('text-green-400');
-                    statusMsg.textContent = '!Conexión guardada con éxito!';
+                    showToast('¡Conexión guardada exitosamente!', 'success');
                     form.reset();
                     if (user) {
                         fetchUserConnections(user.id);
                     }
                 } else {
-                    statusMsg.classList.add('text-red-400');
-                    statusMsg.textContent = result.error || 'Error al guardar la conexión.';
+                    showToast(result.error || 'Error al guardar la conexión.', 'error');
                 }
             } catch (err) {
-                statusMsg.classList.add('text-red-400');
-                statusMsg.textContent = 'Error de red al conectar con el servidor.';
+                showToast('Error de red al conectar con el servidor.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Vincular Integración';
@@ -449,7 +446,35 @@
                 el.textContent = isWebhooksVisible ? fullUrl : maskedUrl;
             });
         }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium transition-all duration-300 transform translate-y-4 opacity-0 ${type === 'success'
+                    ? 'bg-slate-800 border-emerald-500/40 text-emerald-300'
+                    : 'bg-slate-800 border-red-500/40 text-red-300'
+                }`;
+
+            const icon = type === 'success'
+                ? `<svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`
+                : `<svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
     </script>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 </body>
 
 </html>
