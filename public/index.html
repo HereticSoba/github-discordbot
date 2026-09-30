@@ -340,29 +340,30 @@
                         const maskedWebhook = conn.discord_webhook_url.replace(/\/webhooks\/(\d+)\/(.+)$/, '/webhooks/$1/••••••••••••••••');
                         const displayedWebhook = isWebhooksVisible ? conn.discord_webhook_url : maskedWebhook;
                         return `
-                    <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:border-indigo-500/50">
-                        <div class="overflow-hidden flex-grow">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
-                            </div>
-                            <p class="font-mono text-sm text-slate-200 font-semibold truncate">${conn.github_repo}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <p class="text-xs text-slate-400 truncate font-mono">
-                                    <span class="text-slate-500 font-sans">Webhook:</span>
+                    <div class="bg-slate-900/80 border border-slate-700/70 rounded-xl flex overflow-hidden transition hover:border-indigo-500/50">
+                        <div class="p-5 flex-grow overflow-hidden flex flex-col justify-between gap-3">
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">GitHub Repo</span>
+                                <p class="font-mono text-sm text-slate-100 font-bold truncate">${conn.github_repo}</p>
+                                <p class="text-xs text-slate-400 truncate font-mono mt-1">
+                                    <span class="text-slate-500 font-sans font-medium">Webhook:</span>
                                     <span class="webhook-text" data-full-url="${conn.discord_webhook_url}" data-masked-url="${maskedWebhook}">
                                         ${displayedWebhook}
                                     </span>
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
+                        <div>
                             <button onclick="testWebhook('${conn.discord_webhook_url}', '${conn.github_repo}', this)"
-                                class="text-xs text-slate-300 hover:text-indigo-300 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition border border-slate-700 flex items-center gap-1"
+                                class="text-xs font-semibold text-slate-200 hover:text-white bg-slate-800/90 hover:bg-slate-700/80 px-3.5 py-2 rounded-lg transition border border-slate-700/80 inline-flex items-center gap-1.5 shadow-sm"
                                 title="Probar integración de Discord">
-                                    🧪 Probar
+                                    🧪 Probar conexión
                             </button>
+                        </div>
+                    </div>
+                    <div class="w-14 bg-slate-800/40 border-l border-slate-700/50 flex items-center justify-center flex-shrink-0">
                             <button onclick="openDeleteModal('${conn.id}')"
-                                class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition border border-transparent hover:border-red-500/20 flex-shrink-0"
+                                class="text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 p-2.5 rounded-lg transition border border-transparent hover:border-red-500/20"
                                 title="Eliminar integración">
                                 🗑️
                             </button>
